@@ -34,4 +34,5 @@ export function bindDownload(app: Express) {
         res.status(501)
         res.send("Not yet implementet... Sorry.")
     })
+
 }

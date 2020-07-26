@@ -1,16 +1,32 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <link rel="stylesheet" href="/static/master.css">
+    <script src="/static/js/helper.js"></script>
+    <script src="/static/js/main.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Blub Media Server</title>
 </head>
 <body>
     <aside id="album-list">
-        <ul>
+        <ul id="main-track-list">
+
         </ul>
     </aside>
     <main>
-        
+        <audio id="audioplayer" src="" controls></audio>
     </main>
+    <form action="/media/upload" method="post" encType="multipart/form-data">
+        <label for="artist">Title: </label>
+        <input type="text" name="title" id="title"><br />
+        <label for="artist">Artist: </label>
+        <input type="text" name="artist" id="artist"><br />
+        <label for="upload">File: </label>
+        <input type="file" name="upload" id="upload"/> <!--accept=".mp3 .wav .ogg">--><br />    
+        <input type="submit" value="Upload"><br />
+    </form>
+    <footer>
+        <div>Icons erstellt von <a href="https://www.flaticon.com/de/autoren/freepik" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/de/" title="Flaticon">www.flaticon.com</a></div>
+    </footer>
 </body>
 </html>

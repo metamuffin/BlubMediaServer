@@ -32,9 +32,13 @@ Sound file
 
 Archive of all track of the album
 
-### `POST /api/upload`
+### `POST /media/upload`
 
 - Payload:
     - album: id
     - artist: string
     - title: string
+
+## Legal Notices
+
+favicon.ico was created by freepik from flaticon.com
