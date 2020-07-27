@@ -8,21 +8,25 @@
     <title>Blub Media Server</title>
 </head>
 <body>
-    <aside id="album-list">
-        <ul id="main-track-list">
+    <aside>
+        <table id="album-list">
 
-        </ul>
+        </table>
     </aside>
     <main>
         <audio id="audioplayer" src="" controls></audio>
+        <table id="track-list">
+
+        </table>
     </main>
+    
     <form action="/media/upload" method="post" encType="multipart/form-data">
         <label for="artist">Title: </label>
         <input type="text" name="title" id="title"><br />
         <label for="artist">Artist: </label>
         <input type="text" name="artist" id="artist"><br />
         <label for="upload">File: </label>
-        <input type="file" name="upload" id="upload"/> <!--accept=".mp3 .wav .ogg">--><br />    
+        <input type="file" name="upload" id="upload"/><br />    
         <input type="submit" value="Upload"><br />
     </form>
     <footer>

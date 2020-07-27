@@ -7,10 +7,10 @@ window.addEventListener("load",function () {
 
 
 function updateLists() {
-    var ul = document.getElementById("main-track-list");
+    var table = document.getElementById("main-track-list");
     for(const track of tracks) {
-        var li = trackListItem(track);
-        ul.appendChild(li);
+        var tr = trackListItem(track);
+        table.appendChild(tr);
     }
 }
 
@@ -18,21 +18,25 @@ function safeText(s) {
     return s.replace("<","&lt;").replace(">","&gt;")
 }
 
+function getProposedDownloadName(track){
+    return `${safeText(track.title)} - ${safeText(track.artist)}.${safeText(track.ext)}`
+}
+
 function trackListItem(track) {
-    var li = document.createElement("li")
-    li.innerHTML = `
-        <tr>
-            <td>
+    var tr = document.createElement("tr")
+    tr.innerHTML = `<td>
                 <p>${safeText(track.title)}</p>
             </td>
             <td>
-                <p class="artist>${safeText(track.artist)}</p>
+                <p class="artist">${safeText(track.artist)}</p>
             </td>
             <td>
                 <input type="button" value="Play" onclick="javascript:playTrack('${track.id}')" />
+                <a href="/media/track/${track.id}" download="${getProposedDownloadName(track)}">Download</a>
             </td>
-        </tr>`
-    return li
+            
+            `
+    return tr
 }
 
 function playTrack(id) {
