@@ -131,8 +131,9 @@ function scheduleAlbumPlayback(id){
 
 function playNextTrack() {
     var audioplayer = document.getElementById("audioplayer")
-    currentTrack = playbackQueue.pop()
+    currentTrack = playbackQueue.shift()
     setTimeout(updateCurrentTrack,0)
+    setTimeout(updateTrackList,0)
     setTimeout(updatePlaybackQueue,0)
     playing = false;
     if (!currentTrack) return audioplayer.src = ""
