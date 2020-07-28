@@ -44,7 +44,7 @@ async function main(){
         res.send("Sadly, we cant find anything associated to the link you manually typed in the url-bar to get this error.")
     })
 
-    app.listen(8000,"0.0.0.0",() => {
+    app.listen(8080,"0.0.0.0",() => {
         console.log("Listening...");
         
     })

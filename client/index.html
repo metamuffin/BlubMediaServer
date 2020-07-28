@@ -1,36 +1,64 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <link rel="stylesheet" href="/static/master.css">
+    <link rel="stylesheet" href="/static/css/inputs.css">
+    <link rel="stylesheet" href="/static/css/master.css">
     <script src="/static/js/helper.js"></script>
     <script src="/static/js/main.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;300&display=swap" rel="stylesheet"> 
     <title>Blub Media Server</title>
 </head>
 <body>
-    <aside>
-        <table id="album-list">
+    <div class="main">
+        <h1><u>Blub Media Server</u></h1>
+        <section id="section-album-list">
+            <h2><u>Album List:<u></h2>
+            <table id="album-list">
 
-        </table>
-    </aside>
-    <main>
-        <audio id="audioplayer" src="" controls></audio>
-        <table id="track-list">
+            </table>
+        </section>
+        <section id="section-track-list">
+            <h2><u>Track List:</u></h2>
+            <table id="track-list">
 
-        </table>
-    </main>
-    
-    <form action="/media/upload" method="post" encType="multipart/form-data">
-        <label for="artist">Title: </label>
-        <input type="text" name="title" id="title"><br />
-        <label for="artist">Artist: </label>
-        <input type="text" name="artist" id="artist"><br />
-        <label for="upload">File: </label>
-        <input type="file" name="upload" id="upload"/><br />    
-        <input type="submit" value="Upload"><br />
-    </form>
-    <footer>
-        <div>Icons erstellt von <a href="https://www.flaticon.com/de/autoren/freepik" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/de/" title="Flaticon">www.flaticon.com</a></div>
-    </footer>
+            </table>
+        </section>
+        <section id="section-current-track">
+            <div id="current-track"></div>
+            <audio id="audioplayer" src="" controls></audio>
+        </section>
+        <section id="section-playback-queue">
+            <h2 id="playback-queue-headline"></h2>
+            <table id="playback-queue">
+                
+            </table>
+        </section>
+        <section id="section-upload">
+            <h2>Upload Track</h2>
+            <form action="/media/upload" method="post" encType="multipart/form-data">
+                <label for="title">Title: </label>
+                <input required type="text" name="title" id="title"><br />
+                <label for="artist">Artist: </label>
+                <input required type="text" name="artist" id="artist"><br />
+                <select name="album" id="album-select"></select>
+                <br/><label required for="upload" class="upload-button">Select file</label>
+                <input type="file" name="upload" id="upload"/><br />    
+                <input type="submit" value="Upload"><br />
+            </form>
+            <h2>Create new album</h2>
+            <form action="/api/add-album" method="post" encType="multipart/form-data">
+                <label for="title">Title: </label>
+                <input required type="text" name="title" id="title"><br />
+                <label for="artist">Artist: </label>
+                <input required type="text" name="artist" id="artist"><br />
+                <input type="submit" value="Create"><br />
+            </form>
+
+        </section>
+        <footer>
+            <div>Icons erstellt von <a href="https://www.flaticon.com/de/autoren/freepik" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/de/" title="Flaticon">www.flaticon.com</a></div>
+        </footer>
+    </div>
 </body>
 </html>

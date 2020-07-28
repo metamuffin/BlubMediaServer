@@ -1,0 +1,70 @@
+body{
+    background-color: #23272A;
+    color: #ffffff;
+    font-family: 'Roboto', sans-serif;
+
+    --accent-1-l: #9b59b6;
+    --accent-1-d: #8e44ad;
+    --accent-2-l: #3498db;
+    --accent-2-d: #2980b9;
+    --background-1-l: #394d61;
+    --background-1-d: #2c3e50;
+    --background-2-l: #505050;
+    --background-2-d: #252525;
+    --text-1-l: #ecf0f1;
+    --text-1-d: #bdc3c7;
+}
+
+h1 {
+    color: var(--text-1-l);
+    padding: 0.75em;
+    font-size: 1.75em;
+    border-bottom: 6px solid var(--accent-1-d);
+    background-color: var(--background-1-l);
+}
+
+
+h2 {
+    color: var(--text-1-l);
+    padding: 0.25em;
+    font-size: 1.25em;
+}
+
+footer {
+    bottom: 0px;
+    background-color: #23272A;
+    color: var(--text-1-l);
+}
+
+a {
+    color: var(--text-1-l);
+}
+
+.main {
+    background-color: var(--background-1-d);
+    margin-left: 5%;
+    margin-right: 5%;
+}
+
+section {
+    background-color: var(--background-1-l);
+    padding: 1em;
+    margin: 1em;
+}
+table {
+    background-color: var(--background-2-d);
+}
+
+#album-list {
+    border-left: 6px solid var(--accent-1-d);
+    padding-left: 6px;
+}
+
+#track-list {
+    border-left: 6px solid var(--accent-1-d);
+    padding-left: 6px;
+}
+
+#audioplayer {
+    background-color: var(--background-2-d);
+}

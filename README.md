@@ -32,12 +32,22 @@ Sound file
 
 Archive of all track of the album
 
+### `DELETE /api/track/<id>`
+
+### `DELETE /api/album/<id>`
+
 ### `POST /media/upload`
 
 - Payload:
-    - album: id
     - artist: string
     - title: string
+    - album: id
+
+### `POST /api/add-album`
+
+- Payload:
+    - title: string
+    - cover: string
 
 ## Legal Notices
 
