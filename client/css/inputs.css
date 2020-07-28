@@ -44,3 +44,7 @@ input[type=text] {
     background-color: var(--background-2-d);
     color: var(--text-1-l);
 }
+
+input:disabled {
+    border-color: gray;
+}

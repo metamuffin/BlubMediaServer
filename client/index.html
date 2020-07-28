@@ -27,6 +27,7 @@
         <section id="section-current-track">
             <div id="current-track"></div>
             <audio id="audioplayer" src="" controls></audio>
+            <input id="audioplayer-skip" type="button" value="Skip" onclick="document.getElementById('audioplayer').onended()" />
         </section>
         <section id="section-playback-queue">
             <h2 id="playback-queue-headline"></h2>
@@ -45,7 +46,7 @@
                 <select name="album" id="album-select"></select>
                 <br/><label required for="upload" class="upload-button">Select file</label>
                 <input type="file" name="upload" id="upload"/><br />    
-                <input type="submit" value="Upload"><br />
+                <input type="submit" value="Upload" /><br />
             </form>
             <h2>Create new album</h2>
             <form action="/api/add-album" method="post" encType="multipart/form-data">

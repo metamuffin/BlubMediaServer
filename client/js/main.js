@@ -45,11 +45,18 @@ function updateTrackList() {
 
 function updatePlaybackQueue() {
     var h = document.getElementById("playback-queue-headline")
-    h.textContent = (playbackQueue.length == 0) ? "No Tracks in enqueued" : "Playback queue:"
+    var skipbtn = document.getElementById("audioplayer-skip")
     var table = document.getElementById("playback-queue")
+    
+    h.textContent = (playbackQueue.length == 0) ? "No Tracks in enqueued" : "Playback queue:"
     table.innerHTML = ""
     for (const track of playbackQueue) {
         table.appendChild(trackListItem(track,true))
+    }
+    if (!playing) {
+        skipbtn.setAttribute("disabled", "true")
+    } else {
+        skipbtn.removeAttribute("disabled")
     }
 }
 
@@ -67,8 +74,6 @@ function trackListItem(track,queueMode) {
     tr.classList.add("track-item")
     if (playbackQueue.find(t => t.id == track.id)){
         tr.classList.add("track-enqueued")
-        console.log("blub");
-        
     }
     tr.innerHTML = `
         <td>
