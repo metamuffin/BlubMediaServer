@@ -18,6 +18,8 @@ Requirements:
 ```sh
 # Clone the project
 git clone https://www.github.com/MetaMuffin/BlubMediaServer.git
+# Install required packages from npm
+npm install
 # Build
 npm run build
 # Run
