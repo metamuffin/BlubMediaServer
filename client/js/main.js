@@ -65,6 +65,11 @@ function updateCurrentTrack() {
 function trackListItem(track,queueMode) {
     var tr = document.createElement("tr")
     tr.classList.add("track-item")
+    if (playbackQueue.find(t => t.id == track.id)){
+        tr.classList.add("track-enqueued")
+        console.log("blub");
+        
+    }
     tr.innerHTML = `
         <td>
             <p>${safeText(track.title)}</p>
@@ -106,6 +111,7 @@ function schedulePlayback(id){
     console.log(`Scheduled playback of ${id}`);
     playbackQueue.push(trackById(id))
     setTimeout(updatePlaybackQueue)
+    setTimeout(updateTrackList)
     if (!playing) playNextTrack()
 }
 
@@ -145,6 +151,11 @@ function updateFormAlbumDropdown() {
         op.textContent = `${album.title} - ${album.artist}`
         sel.appendChild(op)
     }
+    var op = document.createElement("option")
+    op.setAttribute("value", "")
+    op.textContent = "None"
+    op.setAttribute("selected","")
+    sel.appendChild(op)
 }
 
 function selectAlbum(id) {

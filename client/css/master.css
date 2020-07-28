@@ -3,7 +3,7 @@ body{
     color: #ffffff;
     font-family: 'Roboto', sans-serif;
 
-    --accent-1-l: #9b59b6;
+    --accent-1-l: #b97bd1;
     --accent-1-d: #8e44ad;
     --accent-2-l: #3498db;
     --accent-2-d: #2980b9;
@@ -26,21 +26,31 @@ h1 {
     background-color: var(--background-1-l);
 }
 
-
 h2 {
     color: var(--text-1-l);
     padding: 0.25em;
     font-size: 1.25em;
 }
 
+p {
+    margin: 0px;
+    padding-bottom: 3px;
+    padding-top: 3px;
+}
+
 footer {
+    padding-top: 2em;
     bottom: 0px;
     background-color: #23272A;
     color: var(--text-1-l);
 }
 
 a {
-    color: var(--text-1-l);
+    color: var(--accent-1-l);
+}
+
+tr a {
+    color: var(--text-1-d)
 }
 
 .main {
@@ -54,24 +64,41 @@ section {
     padding: 1em;
     margin: 1em;
 }
+
+
+
 table {
     background-color: var(--background-2-d);
+    width: 100%;
+    border-collapse: collapse;
 }
 
 #album-list {
-    border-left: 6px solid var(--accent-1-d);
     padding-left: 6px;
 }
 
 #track-list {
-    border-left: 6px solid var(--accent-1-d);
     padding-left: 6px;
+    /*overflow-y: scroll;
+    height: 100%;
+    max-height: 70vh;*/
+}
+
+tr {
+    border-left: 6px solid var(--accent-1-d);
+}
+td {
+    padding-left: 0.5em;
+}
+
+.album-item-selected {
+    border-color: var(--accent-3-l);
+}
+
+.track-enqueued {
+    border-color: var(--accent-1-l);
 }
 
 #audioplayer {
     background-color: var(--background-2-d);
-}
-
-.album-item-selected {
-    color: var(--accent-3-l);
 }
