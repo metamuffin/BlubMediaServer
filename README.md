@@ -11,9 +11,9 @@ Blub Media Server does not include any authentifaction process to access the ser
 To run the server you need to first clone this repository then install, build and run the code.
 
 Requirements:
-    - Node.js >= 10.0
-    - npm
-    - A local mongodb server on port 27017
+- Node.js >= 10.0
+- npm
+- A local mongodb server on port 27017
 
 ```sh
 # Clone the project
