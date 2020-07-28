@@ -13,13 +13,13 @@
     <div class="main">
         <h1><u>Blub Media Server</u></h1>
         <section id="section-album-list">
-            <h2><u>Album List:<u></h2>
+            <h2>Album List:</h2>
             <table id="album-list">
 
             </table>
         </section>
         <section id="section-track-list">
-            <h2><u>Track List:</u></h2>
+            <h2 id="track-list-headline">Track List:</h2>
             <table id="track-list">
 
             </table>
@@ -41,6 +41,7 @@
                 <input required type="text" name="title" id="title"><br />
                 <label for="artist">Artist: </label>
                 <input required type="text" name="artist" id="artist"><br />
+                <label for="album">Album: </label>
                 <select name="album" id="album-select"></select>
                 <br/><label required for="upload" class="upload-button">Select file</label>
                 <input type="file" name="upload" id="upload"/><br />    

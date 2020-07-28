@@ -43,7 +43,7 @@ export function bindApi(app: Express) {
                 res.send("Album not found")
                 return
             }
-            album.tracks.push()
+            album.tracks.push(id)
             await dbo.collection("album").findOneAndReplace({id: album.id}, album)
         }
         
@@ -70,6 +70,8 @@ export function bindApi(app: Express) {
             tracks: []
         }
         await dbo.collection("album").insertOne(n)
+        res.status(200)
+        res.send("OK")
     })
 
     app.delete("/api/track/:id", async (req,res) => {

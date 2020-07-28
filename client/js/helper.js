@@ -11,6 +11,10 @@ function updateIndex(cb) {(async () => {
 function trackById(id) {
     return tracks.find((v) => v.id == id)
 }
+function albumById(id) {
+    return albums.find((v) => v.id == id)
+}
+
 
 
 function safeText(s) {
@@ -19,6 +23,20 @@ function safeText(s) {
 
 function getProposedDownloadName(track){
     return `${safeText(track.title)} - ${safeText(track.artist)}.${safeText(track.ext)}`
+}
+
+
+function getProposedAlbumDownloadName(track){
+    return `${safeText(track.title)} - ${safeText(track.artist)}.tar.gz`
+}
+
+function tracksOfAlbum(al) {
+    var a = []
+    if (!al) return a
+    for (const id of al.tracks) {
+        a.push(trackById(id))
+    }
+    return a
 }
 
 // https://www.w3schools.com/js/js_cookies.asp

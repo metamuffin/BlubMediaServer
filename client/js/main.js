@@ -3,6 +3,8 @@ var playbackQueue = []
 var currentTrack;
 var playing = false;
 
+var selectedAlbum;
+
 window.addEventListener("load",function () {
     updateIndex(() => {
         updateTrackList()
@@ -20,15 +22,22 @@ window.addEventListener("load",function () {
 
 function updateAlbumList() {
     var table = document.getElementById("album-list");
+    table.innerHTML = ""
     for(const album of albums) {
-        var tr = albumListItem(album);
+        var isSelected = selectedAlbum && selectedAlbum.id == album.id
+        var tr = albumListItem(album,isSelected);
         table.appendChild(tr);
     }
 }
 
 function updateTrackList() {
+    var h = document.getElementById("track-list-headline")
+    h.textContent = (selectedAlbum) ? `Tracks of ${safeText(selectedAlbum.title)}` : "All Tracks"
     var table = document.getElementById("track-list");
-    for(const track of tracks) {
+    
+    table.innerHTML = ""
+    var selTracks = (!selectedAlbum) ? tracks : tracksOfAlbum(selectedAlbum)
+    for(const track of selTracks) {
         var tr = trackListItem(track);
         table.appendChild(tr);
     }
@@ -72,9 +81,10 @@ function trackListItem(track,queueMode) {
 }
 
 
-function albumListItem(album) {
+function albumListItem(album,selected) {
     var tr = document.createElement("tr")
     tr.classList.add("album-item")
+    if (selected) tr.classList.add("album-item-selected")
     tr.innerHTML = `
         <td>
             <p>${safeText(album.title)}</p>
@@ -83,8 +93,10 @@ function albumListItem(album) {
             <p class="artist">${safeText(album.artist)}</p>
         </td>
         <td>
-            <input type="button" value="Add to queue" onclick="javascript:schedulePlaybackAlbum('${album.id}')" />
-            <a href="/media/album/${album.id}" download="${getProposedDownloadName(album)}">Download</a>
+            <input type="button" value="Add to queue" onclick="javascript:scheduleAlbumPlayback('${album.id}')" />
+            <a href="/media/album/${album.id}" download="${getProposedAlbumDownloadName(album)}">Download</a>
+            ${(!selected) ? `<input type="button" value="View tracks" onclick="javascript:selectAlbum('${album.id}')" />`
+                          : `<input type="button" value="Clear selection" onclick="javascript:selectAlbum()" />`}
         </td>`
     return tr
 }
@@ -95,6 +107,15 @@ function schedulePlayback(id){
     playbackQueue.push(trackById(id))
     setTimeout(updatePlaybackQueue)
     if (!playing) playNextTrack()
+}
+
+
+function scheduleAlbumPlayback(id){
+    console.log(`Scheduled album playback of ${id}`);
+    var album = albumById(id)
+    for (const track of album.tracks) {
+        schedulePlayback(track)
+    }
 }
 
 function playNextTrack() {
@@ -120,7 +141,14 @@ function updateFormAlbumDropdown() {
     sel.innerHTML = ""
     for (const album of albums) {
         var op = document.createElement("option")
+        op.setAttribute("value", album.id)
         op.textContent = `${album.title} - ${album.artist}`
         sel.appendChild(op)
     }
+}
+
+function selectAlbum(id) {
+    selectedAlbum = albumById(id)
+    setTimeout(updateTrackList)
+    setTimeout(updateAlbumList)
 }

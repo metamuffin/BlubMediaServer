@@ -47,7 +47,7 @@ Archive of all track of the album
 
 - Payload:
     - title: string
-    - cover: string
+    - artist: string
 
 ## Legal Notices
 

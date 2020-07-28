@@ -7,12 +7,15 @@ body{
     --accent-1-d: #8e44ad;
     --accent-2-l: #3498db;
     --accent-2-d: #2980b9;
+    --accent-3-l: #f1c40f;
+    --accent-3-d: #f39c12;
     --background-1-l: #394d61;
     --background-1-d: #2c3e50;
     --background-2-l: #505050;
     --background-2-d: #252525;
     --text-1-l: #ecf0f1;
     --text-1-d: #bdc3c7;
+    --text-2-d: #000;
 }
 
 h1 {
@@ -67,4 +70,8 @@ table {
 
 #audioplayer {
     background-color: var(--background-2-d);
+}
+
+.album-item-selected {
+    color: var(--accent-3-l);
 }
