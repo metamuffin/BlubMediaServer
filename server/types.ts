@@ -1,18 +1,34 @@
 
 
 export interface Track {
-    id: string,
     title: string,
     artist: string,
-    album?: string,
-    length: number,
-    ext: string,
-}
- 
-export interface Album {
-    id: string,
-    title: string,
-    artist: string,
-    tracks: Array<string>,
 }
 
+export interface Picture {
+    title: string,
+    note: string,
+    meta: any,
+}
+
+export interface Video {
+    title: string,
+    note: string,
+    meta: any
+}
+
+
+
+export interface Item {
+    type: "track"|"picture"|"video"|"collection",
+    id: string,
+    a: any
+    containedIn: Array<string>,
+}
+
+export interface Collection {
+    title: string,
+    artist: string,
+    note: string,
+    content: Array<string>,
+}

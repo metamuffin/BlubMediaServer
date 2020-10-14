@@ -1,67 +1,26 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <link rel="stylesheet" href="/static/css/inputs.css">
-    <link rel="stylesheet" href="/static/css/master.css">
-    <script src="/static/js/helper.js"></script>
-    <script src="/static/js/main.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;300&display=swap" rel="stylesheet"> 
-    <title>Blub Media Server</title>
+    <title>Blub Mediaserver</title>
 </head>
 <body>
-    <div class="main">
-        <h1><u>Blub Media Server</u></h1>
-        <section id="section-album-list">
-            <h2>Album List:</h2>
-            <table id="album-list">
+    <div id="app-container">
 
-            </table>
-        </section>
-        <section id="section-track-list">
-            <h2 id="track-list-headline">Track List:</h2>
-            <table id="track-list">
+        <div id="overlay-container">
+            
+        </div>
 
-            </table>
-        </section>
-        <section id="section-current-track">
-            <div id="current-track"></div>
-            <audio id="audioplayer" src="" controls></audio>
-            <input id="audioplayer-skip" type="button" value="Skip" onclick="document.getElementById('audioplayer').onended()" />
-        </section>
-        <section id="section-playback-queue">
-            <h2 id="playback-queue-headline"></h2>
-            <table id="playback-queue">
-                
-            </table>
-        </section>
-        <section id="section-upload">
-            <h2>Upload Track</h2>
-            <form action="/media/upload" method="post" encType="multipart/form-data">
-                <label for="title">Title: </label>
-                <input required type="text" name="title" id="title"><br />
-                <label for="artist">Artist: </label>
-                <input required type="text" name="artist" id="artist"><br />
-                <label for="album">Album: </label>
-                <select name="album" id="album-select"></select>
-                <br/><label required for="upload" class="upload-button">Select file</label>
-                <input type="file" name="upload" id="upload"/><br />    
-                <input type="submit" value="Upload" /><br />
-            </form>
-            <h2>Create new album</h2>
-            <form action="/api/add-album" method="post" encType="multipart/form-data">
-                <label for="title">Title: </label>
-                <input required type="text" name="title" id="title"><br />
-                <label for="artist">Artist: </label>
-                <input required type="text" name="artist" id="artist"><br />
-                <input type="submit" value="Create"><br />
-            </form>
-        </section>
-        <footer>
-            <p>Blub Media Server is a open-source project licenced under the GNU General Public Licence Version 3</p>
-            <p>For more information see <a href="https://raw.githubusercontent.com/MetaMuffin/BlubMediaServer/master/LICENCE">LICENCE file on github</a></p>
-            <p>The sources for this project are availible on Github: <a href="https://github.com/MetaMuffin/BlubMediaServer">https://github.com/MetaMuffin/BlubMediaServer</a></p>
-        </footer>
+        <div></div>
+        
+        <div id="viewer">
+            <div id="viewer-sel">
+
+            </div>
+            <div id="viewer-content">
+
+            </div>
+        </div>
     </div>
 </body>
 </html>

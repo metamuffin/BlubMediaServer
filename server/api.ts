@@ -1,117 +1,179 @@
-import { Express } from "express"
-import { dbo } from "."
-import { Track, Album } from "./types"
-import { v4 as UUIDv4 } from "uuid"
-import { join } from "path"
-import { fstat } from "fs"
-import { unlink } from "fs/promises"
+import { Express } from "express";
+import { dbo, db, dboi } from ".";
+import { Track, Collection, Item, Picture, Video } from "./types";
+import { v4 as UUIDv4 } from "uuid";
+import { join, isAbsolute } from "path";
+import { unlink } from "fs/promises";
 
-
-export async function getAllTracks(): Promise<Array<Track>> {
-    return await dbo.collection("track").find({}).toArray()
+export function validateItem(v: any): boolean {
+    var i: Item = v;
+    if (!i.a || !i.type || !i.id || !i.containedIn) return false;
+    if (i.type == "collection") {
+        var icc: Collection = i.a;
+        if (!icc.content || !icc.artist || icc.note || icc.title)
+            return false;
+    } else if (i.type == "picture") {
+        var icp: Picture = i.a;
+        if (!icp.meta || !icp.note || !icp.title) return false;
+    } else if (i.type == "track") {
+        var ict: Track = i.a;
+        if (!ict.artist || !ict.title) return false;
+    } else if (i.type == "video") {
+        var ica: Video = i.a;
+        if (!ica.meta || !ica.title || !ica.note) return false;
+    } else return false;
+    return true;
 }
 
-export async function getAllAlbums(): Promise<Array<Album>> {
-    return await dbo.collection("album").find({}).toArray()
+export function itemWithFiles(i: Item) {
+    return i.type != "collection";
 }
 
-export function trackFilename(t:Track) {
-    return join(__dirname, `../media/${t.id}.${t.ext}`)
+export function tryJsonParse(s: string): any | undefined {
+    try {
+        var j = JSON.parse(s);
+    } catch (e) {
+        return undefined;
+    }
+    return j;
+}
+
+
+export async function getItemByUUID(id:string): Promise<Item | undefined> {
+    if (!id) return undefined
+    return await dbo.collection("item").findOne({id}) || undefined
+}
+export async function patchItemByUUID(id:string,i: Item) {
+    if (!id) return undefined
+    return await dbo.collection("item").replaceOne({id},i);
+}
+export async function deleteItemByUUID(id:string) {
+    if (!id) return undefined
+    return await dbo.collection("item").deleteMany({id});
+}
+
+export function filenameOfItem(i: Item) {
+    return join(__dirname, `../media/${i.a.id}`);
 }
 
 export function bindApi(app: Express) {
-    app.get("/api/index", async (req,res) => {
-        var [tracks,albums] = await Promise.all([getAllTracks(), getAllAlbums()])
-        res.send(JSON.stringify({
-            albums,
-            tracks
-        }))
-    })
+    app.get("/api/", async (req, res) => {});
 
-    app.post("/media/upload", async (req,res) => {
-        if (!req.files || !req.files.upload) {
-            res.status(400)
-            res.send("No file sent.")
+    app.post("/media/add-item", async (req, res) => {
+        if (!validateItem(req.body)) {
+            res.status(400);
+            res.send("Invalid Item");
         }
-        var id = UUIDv4()
-        var file:any = req?.files?.upload
+        var i: Item = req.body;
+        i.id = UUIDv4();
+        var filesNeeded = itemWithFiles(i);
+        if (!req.files || !req.files.upload && filesNeeded) {
+            res.status(400);
+            res.send("No file sent.");
+        }
+        if (filesNeeded) {
+            var file:any = req.files?.upload
+            file.mv(filenameOfItem(i));
+        }
+        await dboi.insertOne(i)
+        res.send("OK")
+    });
+
+    app.patch("/api/item/:id", async (req, res) => {
+        var iold = await getItemByUUID(req.params.id);
+        if (!iold) throw {status: 400, message: "Invalid UUID"};
+        if (!validateItem(req.body)) {
+            res.status(400);
+            res.send("Invalid Item");
+        }
+        var inew: Item = req.body;
+        if (inew.id != iold.id || inew.type != iold.type) throw {status: 400, message: "Cannot change id or type of item with patch."}
+        await patchItemLinks(iold,inew)
+        if (inew.type == "collection") await patchCollectionLinks(iold,inew);
+        await dboi.replaceOne({id:req.params.id},inew);
+        res.send("OK")
         
-        if (req.body.album){
-            var album = await dbo.collection("album").findOne({id: req.body.album})
-            if (!album) {
-                res.status(404)
-                res.send("Album not found")
-                return
-            }
-            album.tracks.push(id)
-            await dbo.collection("album").findOneAndReplace({id: album.id}, album)
-        }
-        
-        var n:Track = {
-            id,
-            title: req.body.title || "unknown",
-            artist: req.body.artist || "unknown",
-            ext: file.name?.split(".")[1] || "unknown",
-            length: 0,
-            album: req.body.album || null
-        }
-        file.mv(trackFilename(n))
-        await dbo.collection("track").insertOne(n)
-        res.status(200)
-        res.send("OK")
-    })
+    });
 
-    app.post("/api/add-album", async (req,res) => {
-        var id = UUIDv4()
-        var n:Album = {
-            id,
-            title: req.body.title || "unknown",
-            artist: req.body.artist || "unknown",
-            tracks: []
+    
+    app.delete("/api/item/:id", async (req, res) => {
+        var i = await getItemByUUID(req.params.id);
+        if (!i) throw {status: 400, message: "Invalid UUID"};
+        var hasFiles = itemWithFiles(i);
+        if (hasFiles) {
+            console.log(`DELETE: ${filenameOfItem(i)}`);
+            //await unlink(filenameOfItem(i))
         }
-        await dbo.collection("album").insertOne(n)
-        res.status(200)
+        await dboi.deleteOne({id:i.id});
         res.send("OK")
-    })
+    });
+}
 
-    app.delete("/api/track/:id", async (req,res) => {
-        var id = req.params.id;
-        var removed = await dbo.collection("track").findOneAndDelete({id: id})
-        if (!removed.ok) {
-            res.status(404)
-            res.send("Track not found.")
-            return
-        }
-        var value:Track = removed.value
-        await unlink(trackFilename(value))
-        if (value.album) {
-            var album:Album|null = await dbo.collection("album").findOne({id: value.album})
-            if (album){
-                album.tracks.splice(album.tracks.findIndex(i => i == value.id),1)
-                await dbo.collection("album").findOneAndReplace({id: album.id},album)
-            }
-        }
-        res.status(200)
-        res.send("OK")
-    })
 
-    app.delete("/api/album/:id", async (req,res) => {
-        var id = req.params.id;
-        var removed = await dbo.collection("album").findOneAndDelete({id: id})
-        if (!removed.ok) {
-            res.status(404)
-            res.send("Track not found.")
-            return
+export async function patchItemLinks(iold: Item, inew: Item) {
+    var links_added = inew.containedIn.filter(l => !iold.containedIn.includes(l));
+    var links_removed = iold.containedIn.filter(l => !inew.containedIn.includes(l));
+    for (const lid of links_added) {
+        var target_item_col:Item | null = await dboi.findOne({id: lid})
+        if (!target_item_col) {
+            console.log(`[${iold.type} ${iold.id}] Cannot add link to invalid collection ${lid}`);
+            continue
         }
-        var dels = []
-        for (const trackId of removed.value.tracks) {
-            dels.push(async () => {
-                var res = await dbo.collection("track").findOneAndDelete({id: trackId})
-                await unlink(trackFilename(res.value))
-            })
+        if (target_item_col.type != "collection") {
+            console.log(`[${iold.type} ${iold.id}] Item would be linked to a non-collection item`);
+            continue
         }
-        await Promise.all(dels)
-        res.status(200)
-        res.send("OK")
-    })
+        var target_col: Collection = target_item_col.a
+        if (target_col.content.includes(lid)) {
+            console.log(`[${iold.type} ${iold.id}] Item was already linked to a collection`);
+            continue
+        }
+        target_col.content.push(lid)
+    }
+    for (const lid of links_removed) {
+        var target_item_col:Item | null = await dboi.findOne({id: lid})
+        if (!target_item_col) {
+            console.log(`[${iold.type} ${iold.id}] Cannot remove invalid link to ${lid} removed`);
+            continue
+        }
+        if (target_item_col.type != "collection") {
+            console.log(`[${iold.type} ${iold.id}] Item was linked to a non-collection item`);
+            continue
+        }
+        var target_col: Collection = target_item_col.a
+        if (!target_col.content.includes(lid)) {
+            console.log(`[${iold.type} ${iold.id}] Item was not linked to a collection`);
+            continue
+        }
+        target_col.content.splice(target_col.content.findIndex(e => e == lid),1)
+    }
+}
+
+export async function patchCollectionLinks(cold: Item, cnew: Item) {
+    var content_added = cnew.containedIn.filter(l => !cold.containedIn.includes(l));
+    var content_removed = cold.containedIn.filter(l => !cnew.containedIn.includes(l));
+    for (const lid of content_added) {
+        var target_item:Item | null = await dboi.findOne({id: lid})
+        if (!target_item) {
+            console.log(`[${cold.type} ${cold.id}] Cannot add link to invalid item ${lid}`);
+            continue
+        }
+        if (target_item.containedIn.includes(lid)) {
+            console.log(`[${cold.type} ${cold.id}] Collection was already linked to this item`);
+            continue
+        }
+        target_item.containedIn.push(lid)
+    }
+    for (const lid of content_removed) {
+        var target_item:Item | null = await dboi.findOne({id: lid})
+        if (!target_item) {
+            console.log(`[${cold.type} ${cold.id}] Cannot remove invalid link to ${lid}`);
+            continue
+        }
+        if (!target_item.containedIn.includes(lid)) {
+            console.log(`[${cold.type} ${cold.id}] Collection was not linked to a item`);
+            continue
+        }
+        target_item.containedIn.splice(target_item.containedIn.findIndex(e => e == lid),1)
+    }
 }

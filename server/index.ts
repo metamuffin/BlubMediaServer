@@ -1,26 +1,28 @@
 
 import Express, { static as estatic } from "express"
-import { bindDownload } from "./download"
 import { join } from "path"
-import { MongoClient, Db } from "mongodb";
-import { bindApi } from "./api";
+import { MongoClient, Db, Collection } from "mongodb";
 import { urlencoded, json } from "body-parser";
 import fileUpload from "express-fileupload";
+import { bindApi } from "./api";
+import { bindDownload } from "./download";
 
 export var db: MongoClient;
 export var dbo: Db;
+export var dboi: Collection
 
 export const errMessage = "We got a lot of problems like this. please report this, even if you already reported 5 bugs today.";
 
 async function main(){
     db = await MongoClient.connect("mongodb://localhost:27017/media")
     dbo = db.db("media")
+    dboi = dbo.collection("item")
 
     const app = Express()
     
     app.use(fileUpload({
         createParentPath: true,
-        limits: { fileSize: 50 * 1024 * 1024 }
+        limits: { fileSize: 50 * 1024 * 1024 } // 50MB
     }))
 
     app.use(json());
