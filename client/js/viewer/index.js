@@ -1,26 +1,19 @@
 
 
-var viewerMode = "normal_grid"
 
-const VIEWER_MODES_COLLECTION = {
-    normal_grid: {
-        display: "Normal (Grid)",
-        render: (i) => console.log("Errorroro")
-    }
-}
 
 const VIEWER_RENDER_ITEM = {
     picture: {
         display: "Picture",
-        render: (i) => console.log("No render function. :(")
+        render: async (i) => {throw new Error("No render function. :(")}
     },
     audio: {
         display: "Picture",
-        render: (i) => console.log("No render function. :(")
+        render: async (i) => {throw new Error("No render function. :(")}
     },
     video: {
         display: "Picture",
-        render: (i) => console.log("No render function. :(")
+        render: async (i) => {throw new Error("No render function. :(")}
     },
     collection: {
         display: "Collection",
@@ -28,9 +21,6 @@ const VIEWER_RENDER_ITEM = {
     }
 }
 
-async function renderCollection(item) {
-
-}
 
 function createLoaderBox(promise) {
     var spinner = document.createElement("div")
@@ -39,25 +29,27 @@ function createLoaderBox(promise) {
     box.classList.add("loader-box")
     box.classList.add("loader-box-loading")
     box.appendChild(spinner)
-    promise.then((el) => {
-        box.classList.remove("loader-box-loading")
-        box.innerHTML = ""
-        box.appendChild(el)
-    })
     promise.catch((err) => {
         box.classList.remove("loader-box-loading")
         box.classList.innerHTML = ""
         box.classList.add("loader-box-failed")
     })
+    promise.then((el) => {
+        box.classList.remove("loader-box-loading")
+        box.innerHTML = ""
+        box.appendChild(el)
+    })
     return box
 }
 
-function renderItem(item) {
+function renderItem(item,level,meta) {
     console.log(item.type);
     if (VIEWER_RENDER_ITEM.hasOwnProperty(item.type)) {
         var ifn = VIEWER_RENDER_ITEM[item.type]
+        var new_meta = Object.assign({},meta)
+        new_meta.level += 1;
         return createLoaderBox(
-            ifn.render(item)
+            ifn.render(item,new_meta)
         )
     } else {
         throw Error("Unsupported Item type :(")
@@ -65,27 +57,7 @@ function renderItem(item) {
 }
 
 function updateViewer() {
-    var viewer_el = renderItem(viewerItem)
+    var viewer_el = renderItem(viewerItem,{top:true,level:0})
     geti("viewer-content").innerHTML = ""
     geti("viewer-content").appendChild(viewer_el)
-}
-
-function updateViewerSel() {
-    var viewer_sel = geti("viewer-sel")
-    viewer_sel.innerHTML = ""
-    if (viewerItem.type != "collection") return
-    for (const iname in VIEWER_MODES_COLLECTION) {
-        if (VIEWER_MODES_COLLECTION.hasOwnProperty(iname)) {
-            const mode = VIEWER_MODES_COLLECTION[iname];
-            var mode_el = document.createElement("input")
-            mode_el.type = "button"
-            mode_el.value = mode.display
-            mode_el.onclick = () => {
-                viewerMode = iname
-                updateViewer()
-            }
-            mode_el.classList.add("viewer-mode-button")
-            viewer_sel.appendChild(mode_el)
-        }
-    }
 }

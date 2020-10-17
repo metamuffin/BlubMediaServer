@@ -3,22 +3,28 @@ input[type=file] {
     display: none;
 }
 
-.upload-button {
-    margin: 1em;
-    padding: 0.25em;
-}
-
 select {
     margin: 1em;
 }
 
-.upload-button, input[type=button],input[type=submit],select {
+.button-big, input[type=button],input[type=submit],select {
     border-radius: 0px;
     border-color: var(--accent-1-d);
     border-style: solid;
     background-color: var(--background-2-d);
     color: var(--text-1-l);
 }
+
+
+.button-big {
+    margin: 1em;
+    padding: 0.25em;
+}
+
+.button-cancel {
+   border-color: var(--accent-2-l)
+}
+
 
 audio {
     background-color: var(--accent-3-d);
@@ -36,15 +42,28 @@ input[type=submit] {
     font-size: large;
 }
 
-input[type=text] {
+input[type=text],textarea {
     margin: 0.3em;
     border-radius: 0px;
     border-color: var(--accent-1-d);
     border-style: solid;
     background-color: var(--background-2-d);
     color: var(--text-1-l);
+    width: max-content;
 }
+
+textarea { resize: vertical; }
 
 input:disabled {
     border-color: gray;
+}
+
+div.type-spec-inputs {
+    display: grid;
+    grid-template-columns: max-content auto 1px;
+    row-gap: 5px;
+}
+
+label {
+    text-align: right;
 }

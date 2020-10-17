@@ -57,13 +57,14 @@ export function filenameOfItem(i: Item) {
 }
 
 export function bindApi(app: Express) {
-    app.get("/api/", async (req, res) => {
+    /*app.get("/api", async (req, res) => {
         res.send(JSON.stringify({
             status: "OK"
         }))
-    });
+    });*/
 
     app.post("/api/add-item", async (req, res) => {
+        console.log(`[API] POST ${req.params.id}`);
         if (!validateItem(req.body)) {
             res.status(400);
             res.send("Invalid Item");
@@ -84,15 +85,20 @@ export function bindApi(app: Express) {
     });
 
     app.get("/api/item/:id", async (req,res) => {
+        console.log(`[API] GET ${req.params.id}`);
         var item = await getItemByUUID(req.params.id)
         if (!item) {
-            res.status(500)
+            console.log("-> Not Found");
+            res.status(404)
             res.send("Item not found")
+            return
         }
         res.send(JSON.stringify(item))
+        console.log(`-> OK`);
     })
 
     app.patch("/api/item/:id", async (req, res) => {
+        console.log(`[API] PATCH ${req.params.id}`);
         var iold = await getItemByUUID(req.params.id);
         if (!iold) throw {status: 400, message: "Invalid UUID"};
         if (!validateItem(req.body)) {
@@ -109,6 +115,7 @@ export function bindApi(app: Express) {
 
     
     app.delete("/api/item/:id", async (req, res) => {
+        console.log(`[API] DELETE ${req.params.id}`);
         var i = await getItemByUUID(req.params.id);
         if (!i) throw {status: 400, message: "Invalid UUID"};
         var hasFiles = itemWithFiles(i);

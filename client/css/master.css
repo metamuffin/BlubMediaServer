@@ -33,7 +33,7 @@ h1 {
     background-color: var(--background-1-l);
 }
 
-h2 {
+h2,h3,h4 {
     color: var(--text-1-l);
     padding: 0.25em;
     font-size: 1.25em;

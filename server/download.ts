@@ -6,7 +6,7 @@ import archiver from "archiver";
 import {Archiver} from "archiver";
 
 export function bindDownload(app:Express) {
-    app.get("/api/item/:id", async (req, res) => {
+    app.get("/api/item-dl/:id", async (req, res) => {
         var i: Item |undefined = await getItemByUUID(req.params.id);
         if (!i) throw {status: 400, message: "Invalid item id"}
 

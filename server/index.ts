@@ -13,7 +13,9 @@ export var dboi: MCollection;
 
 export const errMessage =
     "We got a lot of problems like this. please report this, even if you already reported 5 bugs today.";
-export const ROOT_COLLECTION = "'00000000-0000-0000-0000-000000000000'";
+export const ROOT_COLLECTION = "00000000-0000-0000-0000-000000000000";
+
+const SLOWDOWN_DEBUG = false
 
 async function main() {
     db = await MongoClient.connect("mongodb://localhost:27017/media");
@@ -36,14 +38,18 @@ async function main() {
         res.sendFile(join(__dirname, "../client/index.html"));
     });
 
+    app.use("/static", estatic(join(__dirname, "../client")));
+
     app.get("/favicon.ico", (req, res) => {
         res.sendFile(join(__dirname, "../client/favicon.ico"));
     });
+    
+    if (SLOWDOWN_DEBUG) app.use((req,res,next) => {
+        setTimeout(next,1000)
+    })
 
-    app.use("/static", estatic(join(__dirname, "../client")));
-
-    bindDownload(app);
     bindApi(app);
+    bindDownload(app);
 
     app.use((req, res, next) => {
         res.status(404);
