@@ -1,6 +1,6 @@
 import { Express } from "express";
 import { dbo, db, dboi } from ".";
-import { Track, Collection, Item, Picture, Video } from "./types";
+import { Audio, Collection, Item, Picture, Video } from "./types";
 import { v4 as UUIDv4 } from "uuid";
 import { join, isAbsolute } from "path";
 import { unlink } from "fs/promises";
@@ -15,8 +15,8 @@ export function validateItem(v: any): boolean {
     } else if (i.type == "picture") {
         var icp: Picture = i.a;
         if (!icp.meta || !icp.note || !icp.title) return false;
-    } else if (i.type == "track") {
-        var ict: Track = i.a;
+    } else if (i.type == "audio") {
+        var ict: Audio = i.a;
         if (!ict.artist || !ict.title) return false;
     } else if (i.type == "video") {
         var ica: Video = i.a;
@@ -57,9 +57,13 @@ export function filenameOfItem(i: Item) {
 }
 
 export function bindApi(app: Express) {
-    app.get("/api/", async (req, res) => {});
+    app.get("/api/", async (req, res) => {
+        res.send(JSON.stringify({
+            status: "OK"
+        }))
+    });
 
-    app.post("/media/add-item", async (req, res) => {
+    app.post("/api/add-item", async (req, res) => {
         if (!validateItem(req.body)) {
             res.status(400);
             res.send("Invalid Item");
@@ -79,6 +83,15 @@ export function bindApi(app: Express) {
         res.send("OK")
     });
 
+    app.get("/api/item/:id", async (req,res) => {
+        var item = await getItemByUUID(req.params.id)
+        if (!item) {
+            res.status(500)
+            res.send("Item not found")
+        }
+        res.send(JSON.stringify(item))
+    })
+
     app.patch("/api/item/:id", async (req, res) => {
         var iold = await getItemByUUID(req.params.id);
         if (!iold) throw {status: 400, message: "Invalid UUID"};
@@ -92,7 +105,6 @@ export function bindApi(app: Express) {
         if (inew.type == "collection") await patchCollectionLinks(iold,inew);
         await dboi.replaceOne({id:req.params.id},inew);
         res.send("OK")
-        
     });
 
     

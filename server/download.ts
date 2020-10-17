@@ -42,7 +42,7 @@ export async function addItemToArchive(archive: Archiver,item: Item) {
 export function itemDisplayName(item: Item) {
     if (item.type == "collection") return `${item.a.title}`
     if (item.type == "picture") return `${item.a.title}`
-    if (item.type == "track") return `${item.a.artist} - ${item.a.title}`
+    if (item.type == "audio") return `${item.a.artist} - ${item.a.title}`
     if (item.type == "video") return `${item.a.title}`
     else return `UNKNOWN ${Math.random()}`
 }

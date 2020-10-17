@@ -1,6 +1,6 @@
 
 
-export interface Track {
+export interface Audio {
     title: string,
     artist: string,
 }
@@ -20,7 +20,7 @@ export interface Video {
 
 
 export interface Item {
-    type: "track"|"picture"|"video"|"collection",
+    type: "audio"|"picture"|"video"|"collection",
     id: string,
     a: any
     containedIn: Array<string>,
