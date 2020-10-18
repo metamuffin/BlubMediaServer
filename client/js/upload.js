@@ -120,7 +120,7 @@ async function uploadItemButton() {
 
     submit.onclick = async () => {
         await addItem(res_item,formdata)
-        popOverlay()
+        //popOverlay()
     }
     cancel.onclick = () => {
         popOverlay()

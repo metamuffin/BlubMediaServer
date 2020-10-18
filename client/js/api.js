@@ -25,3 +25,7 @@ async function addItem(item,formdata) {
     })
     return res.status
 }
+
+function downloadUrlOfItem(item) {
+    return API_ENDPOINT + `/item-dl/${item.id}`
+}

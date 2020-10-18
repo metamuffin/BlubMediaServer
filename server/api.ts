@@ -7,7 +7,7 @@ import { unlink } from "fs/promises";
 
 export function validateItem(v: any): boolean {
     var i: Item = v;
-    if (!i) return false
+    if (!i) return false;
     if (!i.a || !i.type || !i.id || !i.containedIn) return false;
     if (i.type == "collection") {
         var icc: Collection = i.a;
@@ -72,14 +72,14 @@ export function bindApi(app: Express) {
     });*/
 
     app.post("/api/add-item", async (req, res) => {
-        var __temp:any = req.query.json // TODO
-        var json_input = tryJsonParse(__temp)
+        var __temp: any = req.query.json; // TODO
+        var json_input = tryJsonParse(__temp);
         if (!json_input || !validateItem(json_input)) {
             res.status(400);
             res.send("Invalid Item");
             return;
         }
-        var a:any = ""  
+        var a: any = "";
         var i: Item = json_input || a;
         console.log(`[API] Add item`);
         i.id = UUIDv4();
@@ -94,6 +94,15 @@ export function bindApi(app: Express) {
             file.mv(filenameOfItem(i));
         }
         await dboi.insertOne(i);
+        patchItemLinks(
+            {
+                a: {},
+                containedIn: [],
+                id: "[IOLD PLACEHOLDER]",
+                type: i.type,
+            },
+            i
+        );
         res.send("-> OK");
     });
 
@@ -153,53 +162,57 @@ export async function patchItemLinks(iold: Item, inew: Item) {
         (l) => !inew.containedIn.includes(l)
     );
     for (const lid of links_added) {
+        console.log(`New link from ${inew.id} to ${lid}`);
         var target_item_col: Item | null = await dboi.findOne({ id: lid });
         if (!target_item_col) {
             console.log(
-                `[${iold.type} ${iold.id}] Cannot add link to invalid collection ${lid}`
+                `[${inew.type} ${inew.id}] Cannot add link to invalid collection ${lid}`
             );
             continue;
         }
         if (target_item_col.type != "collection") {
             console.log(
-                `[${iold.type} ${iold.id}] Item would be linked to a non-collection item`
+                `[${inew.type} ${inew.id}] Item would be linked to a non-collection item`
             );
             continue;
         }
         var target_col: Collection = target_item_col.a;
-        if (target_col.content.includes(lid)) {
+        if (target_col.content.includes(inew.id)) {
             console.log(
-                `[${iold.type} ${iold.id}] Item was already linked to a collection`
+                `[${inew.type} ${inew.id}] Item was already linked to a collection`
             );
             continue;
         }
-        target_col.content.push(lid);
+        target_col.content.push(inew.id);
+        await dboi.replaceOne({ id: lid }, target_item_col);
     }
     for (const lid of links_removed) {
+        console.log(`Link removed from ${inew.id} to ${lid}`);
         var target_item_col: Item | null = await dboi.findOne({ id: lid });
         if (!target_item_col) {
             console.log(
-                `[${iold.type} ${iold.id}] Cannot remove invalid link to ${lid} removed`
+                `[${inew.type} ${inew.id}] Cannot remove invalid link to ${lid} removed`
             );
             continue;
         }
         if (target_item_col.type != "collection") {
             console.log(
-                `[${iold.type} ${iold.id}] Item was linked to a non-collection item`
+                `[${inew.type} ${inew.id}] Item was linked to a non-collection item`
             );
             continue;
         }
         var target_col: Collection = target_item_col.a;
-        if (!target_col.content.includes(lid)) {
+        if (!target_col.content.includes(inew.id)) {
             console.log(
-                `[${iold.type} ${iold.id}] Item was not linked to a collection`
+                `[${inew.type} ${inew.id}] Item was not linked to a collection`
             );
             continue;
         }
         target_col.content.splice(
-            target_col.content.findIndex((e) => e == lid),
+            target_col.content.findIndex((e) => e == inew.id),
             1
         );
+        await dboi.replaceOne({ id: lid }, target_item_col);
     }
 }
 
@@ -218,13 +231,14 @@ export async function patchCollectionLinks(cold: Item, cnew: Item) {
             );
             continue;
         }
-        if (target_item.containedIn.includes(lid)) {
+        if (target_item.containedIn.includes(cnew.id)) {
             console.log(
                 `[${cold.type} ${cold.id}] Collection was already linked to this item`
             );
             continue;
         }
-        target_item.containedIn.push(lid);
+        target_item.containedIn.push(cnew.id);
+        await dboi.replaceOne({ id: lid }, target_item);
     }
     for (const lid of content_removed) {
         var target_item: Item | null = await dboi.findOne({ id: lid });
@@ -234,15 +248,16 @@ export async function patchCollectionLinks(cold: Item, cnew: Item) {
             );
             continue;
         }
-        if (!target_item.containedIn.includes(lid)) {
+        if (!target_item.containedIn.includes(cnew.id)) {
             console.log(
                 `[${cold.type} ${cold.id}] Collection was not linked to a item`
             );
             continue;
         }
         target_item.containedIn.splice(
-            target_item.containedIn.findIndex((e) => e == lid),
+            target_item.containedIn.findIndex((e) => e == cnew.id),
             1
         );
+        await dboi.replaceOne({ id: lid }, target_item);
     }
 }

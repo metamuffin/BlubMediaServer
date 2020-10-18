@@ -7,7 +7,7 @@ async function renderCollection(item, meta) {
         var title_p = document.createElement("h3")
         title_p.textContent = item.a.title
         div.appendChild(title_p)
-        var inner = await VIEWER_MODES_COLLECTION[viewerCollectionMode].render(item,meta)
+        var inner = VIEWER_MODES_COLLECTION[viewerCollectionMode].render(item,meta)
         div.appendChild(inner)
         return div
     } else {
@@ -41,17 +41,18 @@ function updateViewerCollectionMode() {
     }
 }
 
-var viewerCollectionMode = "normal_list"
+var viewerCollectionMode = "normal_grid"
 
 const VIEWER_MODES_COLLECTION = {
     normal_list: {
         display: "Normal (List)",
-        render: async (i,level,meta) => {
+        render: (i,meta) => {
+            meta.inlist = true
             var list = document.createElement("ul")
             list.classList.add("viewer-content-normal-list")
             for (const item of i.a.content) {
                 var li = document.createElement("li")
-                console.log(item);
+                console.log("asddas",item);
                 var item_el = renderItem(item,meta)
                 li.appendChild(item_el)
                 list.appendChild(li)
@@ -61,8 +62,15 @@ const VIEWER_MODES_COLLECTION = {
     },
     normal_grid: {
         display: "Normal (Grid)",
-        render: async (item,meta) => {
-            throw new Error("Unimplemtnetssasf uhatv zhkt")
+        render: (i,meta) => {
+            meta.ingrid = true
+            var grid = document.createElement("div")
+            grid.classList.add("viewer-content-normal-grid")
+            for (const item of i.a.content) {
+                var item_el = renderItem(item,meta)
+                grid.appendChild(item_el)
+            }
+            return grid
         }
     }
 }

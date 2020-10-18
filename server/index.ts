@@ -16,7 +16,7 @@ export const errMessage =
     "We got a lot of problems like this. please report this, even if you already reported 5 bugs today.";
 export const ROOT_COLLECTION = "00000000-0000-0000-0000-000000000000";
 
-const SLOWDOWN_DEBUG = true;
+const SLOWDOWN_DEBUG = false;
 
 async function main() {
     db = await MongoClient.connect("mongodb://localhost:27017/media");

@@ -1,0 +1,26 @@
+.viewer-content-normal-list li div div {
+    width: 50vw;
+    min-height: 15em;
+    max-height: 15em;
+    overflow: hidden;
+}
+
+.viewer-content-normal-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(10em, 15em));
+    grid-template-rows: repeat(auto-fit, 15em);
+}
+
+/*.viewer-content-collection {
+
+}*/
+
+.viewer-content-collection-hide-content {
+    background-color: var(--background-2-l);
+    height: 100%;
+    width: 100%;
+}
+.viewer-content-collection-hide-content h4 {
+    color: var(--accent-2-l);
+    /*text-align: center;*/
+}
