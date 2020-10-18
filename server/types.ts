@@ -22,6 +22,7 @@ export interface Item {
     id: string,
     a: any
     containedIn: Array<string>,
+    file?: string
 }
 
 export interface Collection {

@@ -1,11 +1,12 @@
-import Express, { static as estatic } from "express";
+import Express, { static as estatic, json } from "express";
 import { join } from "path";
-import { MongoClient, Db, Collection as MCollection} from "mongodb";
-import { urlencoded, json } from "body-parser";
-import fileUpload from "express-fileupload";
+import { MongoClient, Db, Collection as MCollection } from "mongodb";
+import { urlencoded } from "body-parser";
 import { bindApi } from "./api";
 import { bindDownload } from "./download";
 import { Item, Collection } from "./types";
+import connectBusboy from "connect-busboy";
+import fileUpload from "express-fileupload";
 
 export var db: MongoClient;
 export var dbo: Db;
@@ -15,7 +16,7 @@ export const errMessage =
     "We got a lot of problems like this. please report this, even if you already reported 5 bugs today.";
 export const ROOT_COLLECTION = "00000000-0000-0000-0000-000000000000";
 
-const SLOWDOWN_DEBUG = false
+const SLOWDOWN_DEBUG = true;
 
 async function main() {
     db = await MongoClient.connect("mongodb://localhost:27017/media");
@@ -27,12 +28,13 @@ async function main() {
     app.use(
         fileUpload({
             createParentPath: true,
-            limits: { fileSize: 50 * 1024 * 1024 }, // 50MB
+            limits: { fileSize: 500 * 1024 * 1024 }, // 500MB
+            safeFileNames: true,
         })
     );
 
     app.use(json());
-    app.use(urlencoded({ extended: true }));
+    //app.use(urlencoded({ extended: true }));
 
     app.get("/", (req, res) => {
         res.sendFile(join(__dirname, "../client/index.html"));
@@ -43,10 +45,11 @@ async function main() {
     app.get("/favicon.ico", (req, res) => {
         res.sendFile(join(__dirname, "../client/favicon.ico"));
     });
-    
-    if (SLOWDOWN_DEBUG) app.use((req,res,next) => {
-        setTimeout(next,1000)
-    })
+
+    if (SLOWDOWN_DEBUG)
+        app.use((req, res, next) => {
+            setTimeout(next, 1000);
+        });
 
     bindApi(app);
     bindDownload(app);
@@ -63,17 +66,19 @@ async function main() {
             artist: "",
             content: [],
             note: "All Contents of this Mediaserver",
-            title: "Root"
-        }
+            title: "Root",
+        };
         var i: Item = {
             id: ROOT_COLLECTION,
             a: c,
             containedIn: [],
-            type: "collection"
+            type: "collection",
         };
         await dboi.insertOne(i);
-        console.log("Created new Root Collection");   
+        console.log("Created new Root Collection");
     }
+
+    app.disable("x-powered-by");
 
     app.listen(8080, "0.0.0.0", () => {
         console.log("Listening...");

@@ -12,7 +12,12 @@ const KEY_DISPLAY = {
     artist: "Artist: ",
 
 }
-
+const ITEM_SPEC_GEN = {
+    audio: () => ({title: "", artist: ""}),
+    picture: () => ({title: "", note: "", meta: ""}),
+    video: () => ({title: "", note: "", meta: ""}),
+    collection: () => ({title: "", artist: "", note: "", content: []}),
+}
 
 function sleep(ms) {
     return new Promise((r, _) => {
@@ -24,9 +29,20 @@ function geti(id) {
     return document.getElementById(id)
 }
 
+function para(text) {
+    var p = document.createElement("p")
+    p.textContent = text
+    return p
+}
 
-function genIcon(name) {
-    throw Error("TODO")
+function genSpinner() {
+    var spinner = document.createElement("div")
+    spinner.classList.add("loader-box-spinner")
+    for (let i = 0; i < 8; i++) {
+        var e = document.createElement("div")
+        spinner.appendChild(e)
+    }
+    return spinner
 }
 
 function genericInputSetter(key, type, target, attr) {
@@ -39,6 +55,7 @@ function genericInputSetter(key, type, target, attr) {
         if (attr.hasOwnProperty(attr_name)) inp.setAttribute(attr_name, attr[attr_name])
     }
     inp.value = target[key] || ""
+    target[key] = inp.value
 
     inp.onchange = () => {
         console.log("Input onchange: " + inp.value);
@@ -57,14 +74,24 @@ function genericInputSetter(key, type, target, attr) {
     return [label, inp, br]
 }
 
-function fileSelectInput(key, formdata) {
+function fileSelectInput(key,target,accept) {
+    var div = document.createElement("div")
     var inp = document.createElement("input")
     inp.type = "file"
     inp.onchange = (ev) => {
+        div.children[0].style.display = "none"
+        div.append(para("File ready to upload!"))
+        
         var file = ev.target.files[0]
-        formdata.set(key, file)
+        console.log(ev.target.files[0]);
+        
+        target.set("file",file)
     }
-    return inp
+    inp.setAttribute("accept",accept)
+    inp.setAttribute("name","fileuploader")
+    inp.setAttribute("value","Select File")
+    div.appendChild(inp)
+    return div
 }
 
 function randomId(len) {

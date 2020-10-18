@@ -67,26 +67,14 @@ section {
     margin: 1em;
 }
 
-/*#div-track-list {
-    max-height: 60vh;
-    overflow-y: scroll;
-}*/
 
 table {
     background-color: var(--background-2-d);
     width: 100%;
     border-collapse: collapse;
-    
-
 }
 
-/*#album-list {
-    padding-left: 6px;
-}
 
-#track-list {
-    padding-left: 6px;
-}*/
 
 tr {
     border-left: 6px solid var(--accent-1-d);
@@ -95,15 +83,10 @@ td {
     padding-left: 0.5em;
 }
 
-/*.album-item-selected {
-    border-color: var(--accent-3-l);
-}
-
-.track-enqueued {
+.box {
+    border-style: solid;
     border-color: var(--accent-1-l);
-}
+    border-width: 4px;
+    padding: 10px;
 
-#audioplayer {
-    background-color: var(--background-2-d);
 }
-*/

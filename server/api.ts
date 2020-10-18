@@ -7,21 +7,30 @@ import { unlink } from "fs/promises";
 
 export function validateItem(v: any): boolean {
     var i: Item = v;
+    if (!i) return false
     if (!i.a || !i.type || !i.id || !i.containedIn) return false;
     if (i.type == "collection") {
         var icc: Collection = i.a;
-        if (!icc.content || !icc.artist || icc.note || icc.title)
+        if (
+            undefined == icc.content ||
+            undefined == icc.artist ||
+            undefined == icc.note ||
+            !icc.title
+        )
             return false;
     } else if (i.type == "picture") {
         var icp: Picture = i.a;
-        if (!icp.meta || !icp.note || !icp.title) return false;
+        if (undefined == icp.meta || undefined == icp.note || !icp.title)
+            return false;
     } else if (i.type == "audio") {
         var ict: Audio = i.a;
-        if (!ict.artist || !ict.title) return false;
+        if (undefined == ict.artist || !ict.title) return false;
     } else if (i.type == "video") {
         var ica: Video = i.a;
-        if (!ica.meta || !ica.title || !ica.note) return false;
+        if (undefined == ica.meta || !ica.title || undefined == ica.note)
+            return false;
     } else return false;
+    console.log("E");
     return true;
 }
 
@@ -38,22 +47,21 @@ export function tryJsonParse(s: string): any | undefined {
     return j;
 }
 
-
-export async function getItemByUUID(id:string): Promise<Item | undefined> {
-    if (!id) return undefined
-    return await dbo.collection("item").findOne({id}) || undefined
+export async function getItemByUUID(id: string): Promise<Item | undefined> {
+    if (!id) return undefined;
+    return (await dbo.collection("item").findOne({ id })) || undefined;
 }
-export async function patchItemByUUID(id:string,i: Item) {
-    if (!id) return undefined
-    return await dbo.collection("item").replaceOne({id},i);
+export async function patchItemByUUID(id: string, i: Item) {
+    if (!id) return undefined;
+    return await dbo.collection("item").replaceOne({ id }, i);
 }
-export async function deleteItemByUUID(id:string) {
-    if (!id) return undefined
-    return await dbo.collection("item").deleteMany({id});
+export async function deleteItemByUUID(id: string) {
+    if (!id) return undefined;
+    return await dbo.collection("item").deleteMany({ id });
 }
 
 export function filenameOfItem(i: Item) {
-    return join(__dirname, `../media/${i.a.id}`);
+    return join(__dirname, `../media/${i.id}`);
 }
 
 export function bindApi(app: Express) {
@@ -64,135 +72,177 @@ export function bindApi(app: Express) {
     });*/
 
     app.post("/api/add-item", async (req, res) => {
-        console.log(`[API] POST ${req.params.id}`);
-        if (!validateItem(req.body)) {
+        var __temp:any = req.query.json // TODO
+        var json_input = tryJsonParse(__temp)
+        if (!json_input || !validateItem(json_input)) {
             res.status(400);
             res.send("Invalid Item");
+            return;
         }
-        var i: Item = req.body;
+        var a:any = ""  
+        var i: Item = json_input || a;
+        console.log(`[API] Add item`);
         i.id = UUIDv4();
         var filesNeeded = itemWithFiles(i);
-        if (!req.files || !req.files.upload && filesNeeded) {
+        if ((!req.files || !req.files.file) && filesNeeded) {
             res.status(400);
-            res.send("No file sent.");
+            res.send("-> No file sent.");
+            return;
         }
         if (filesNeeded) {
-            var file:any = req.files?.upload
+            var file: any = req.files?.file;
             file.mv(filenameOfItem(i));
         }
-        await dboi.insertOne(i)
-        res.send("OK")
+        await dboi.insertOne(i);
+        res.send("-> OK");
     });
 
-    app.get("/api/item/:id", async (req,res) => {
+    app.get("/api/item/:id", async (req, res) => {
         console.log(`[API] GET ${req.params.id}`);
-        var item = await getItemByUUID(req.params.id)
+        var item = await getItemByUUID(req.params.id);
         if (!item) {
             console.log("-> Not Found");
-            res.status(404)
-            res.send("Item not found")
-            return
+            res.status(404);
+            res.send("Item not found");
+            return;
         }
-        res.send(JSON.stringify(item))
+        res.send(JSON.stringify(item));
         console.log(`-> OK`);
-    })
+    });
 
     app.patch("/api/item/:id", async (req, res) => {
         console.log(`[API] PATCH ${req.params.id}`);
         var iold = await getItemByUUID(req.params.id);
-        if (!iold) throw {status: 400, message: "Invalid UUID"};
+        if (!iold) throw { status: 400, message: "Invalid UUID" };
         if (!validateItem(req.body)) {
             res.status(400);
             res.send("Invalid Item");
+            return;
         }
         var inew: Item = req.body;
-        if (inew.id != iold.id || inew.type != iold.type) throw {status: 400, message: "Cannot change id or type of item with patch."}
-        await patchItemLinks(iold,inew)
-        if (inew.type == "collection") await patchCollectionLinks(iold,inew);
-        await dboi.replaceOne({id:req.params.id},inew);
-        res.send("OK")
+        if (inew.id != iold.id || inew.type != iold.type)
+            throw {
+                status: 400,
+                message: "Cannot change id or type of item with patch.",
+            };
+        await patchItemLinks(iold, inew);
+        if (inew.type == "collection") await patchCollectionLinks(iold, inew);
+        await dboi.replaceOne({ id: req.params.id }, inew);
+        res.send("OK");
     });
 
-    
     app.delete("/api/item/:id", async (req, res) => {
         console.log(`[API] DELETE ${req.params.id}`);
         var i = await getItemByUUID(req.params.id);
-        if (!i) throw {status: 400, message: "Invalid UUID"};
+        if (!i) throw { status: 400, message: "Invalid UUID" };
         var hasFiles = itemWithFiles(i);
         if (hasFiles) {
             console.log(`DELETE: ${filenameOfItem(i)}`);
             //await unlink(filenameOfItem(i))
         }
-        await dboi.deleteOne({id:i.id});
-        res.send("OK")
+        await dboi.deleteOne({ id: i.id });
+        res.send("OK");
     });
 }
 
-
 export async function patchItemLinks(iold: Item, inew: Item) {
-    var links_added = inew.containedIn.filter(l => !iold.containedIn.includes(l));
-    var links_removed = iold.containedIn.filter(l => !inew.containedIn.includes(l));
+    var links_added = inew.containedIn.filter(
+        (l) => !iold.containedIn.includes(l)
+    );
+    var links_removed = iold.containedIn.filter(
+        (l) => !inew.containedIn.includes(l)
+    );
     for (const lid of links_added) {
-        var target_item_col:Item | null = await dboi.findOne({id: lid})
+        var target_item_col: Item | null = await dboi.findOne({ id: lid });
         if (!target_item_col) {
-            console.log(`[${iold.type} ${iold.id}] Cannot add link to invalid collection ${lid}`);
-            continue
+            console.log(
+                `[${iold.type} ${iold.id}] Cannot add link to invalid collection ${lid}`
+            );
+            continue;
         }
         if (target_item_col.type != "collection") {
-            console.log(`[${iold.type} ${iold.id}] Item would be linked to a non-collection item`);
-            continue
+            console.log(
+                `[${iold.type} ${iold.id}] Item would be linked to a non-collection item`
+            );
+            continue;
         }
-        var target_col: Collection = target_item_col.a
+        var target_col: Collection = target_item_col.a;
         if (target_col.content.includes(lid)) {
-            console.log(`[${iold.type} ${iold.id}] Item was already linked to a collection`);
-            continue
+            console.log(
+                `[${iold.type} ${iold.id}] Item was already linked to a collection`
+            );
+            continue;
         }
-        target_col.content.push(lid)
+        target_col.content.push(lid);
     }
     for (const lid of links_removed) {
-        var target_item_col:Item | null = await dboi.findOne({id: lid})
+        var target_item_col: Item | null = await dboi.findOne({ id: lid });
         if (!target_item_col) {
-            console.log(`[${iold.type} ${iold.id}] Cannot remove invalid link to ${lid} removed`);
-            continue
+            console.log(
+                `[${iold.type} ${iold.id}] Cannot remove invalid link to ${lid} removed`
+            );
+            continue;
         }
         if (target_item_col.type != "collection") {
-            console.log(`[${iold.type} ${iold.id}] Item was linked to a non-collection item`);
-            continue
+            console.log(
+                `[${iold.type} ${iold.id}] Item was linked to a non-collection item`
+            );
+            continue;
         }
-        var target_col: Collection = target_item_col.a
+        var target_col: Collection = target_item_col.a;
         if (!target_col.content.includes(lid)) {
-            console.log(`[${iold.type} ${iold.id}] Item was not linked to a collection`);
-            continue
+            console.log(
+                `[${iold.type} ${iold.id}] Item was not linked to a collection`
+            );
+            continue;
         }
-        target_col.content.splice(target_col.content.findIndex(e => e == lid),1)
+        target_col.content.splice(
+            target_col.content.findIndex((e) => e == lid),
+            1
+        );
     }
 }
 
 export async function patchCollectionLinks(cold: Item, cnew: Item) {
-    var content_added = cnew.containedIn.filter(l => !cold.containedIn.includes(l));
-    var content_removed = cold.containedIn.filter(l => !cnew.containedIn.includes(l));
+    var content_added = cnew.containedIn.filter(
+        (l) => !cold.containedIn.includes(l)
+    );
+    var content_removed = cold.containedIn.filter(
+        (l) => !cnew.containedIn.includes(l)
+    );
     for (const lid of content_added) {
-        var target_item:Item | null = await dboi.findOne({id: lid})
+        var target_item: Item | null = await dboi.findOne({ id: lid });
         if (!target_item) {
-            console.log(`[${cold.type} ${cold.id}] Cannot add link to invalid item ${lid}`);
-            continue
+            console.log(
+                `[${cold.type} ${cold.id}] Cannot add link to invalid item ${lid}`
+            );
+            continue;
         }
         if (target_item.containedIn.includes(lid)) {
-            console.log(`[${cold.type} ${cold.id}] Collection was already linked to this item`);
-            continue
+            console.log(
+                `[${cold.type} ${cold.id}] Collection was already linked to this item`
+            );
+            continue;
         }
-        target_item.containedIn.push(lid)
+        target_item.containedIn.push(lid);
     }
     for (const lid of content_removed) {
-        var target_item:Item | null = await dboi.findOne({id: lid})
+        var target_item: Item | null = await dboi.findOne({ id: lid });
         if (!target_item) {
-            console.log(`[${cold.type} ${cold.id}] Cannot remove invalid link to ${lid}`);
-            continue
+            console.log(
+                `[${cold.type} ${cold.id}] Cannot remove invalid link to ${lid}`
+            );
+            continue;
         }
         if (!target_item.containedIn.includes(lid)) {
-            console.log(`[${cold.type} ${cold.id}] Collection was not linked to a item`);
-            continue
+            console.log(
+                `[${cold.type} ${cold.id}] Collection was not linked to a item`
+            );
+            continue;
         }
-        target_item.containedIn.splice(target_item.containedIn.findIndex(e => e == lid),1)
+        target_item.containedIn.splice(
+            target_item.containedIn.findIndex((e) => e == lid),
+            1
+        );
     }
 }

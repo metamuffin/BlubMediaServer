@@ -23,12 +23,12 @@ const VIEWER_RENDER_ITEM = {
 
 
 function createLoaderBox(promise) {
-    var spinner = document.createElement("div")
-    spinner.classList.add("loader-box-spinner")
     var box = document.createElement("div")
     box.classList.add("loader-box")
     box.classList.add("loader-box-loading")
+    var spinner = genSpinner()
     box.appendChild(spinner)
+    
     promise.catch((err) => {
         box.classList.remove("loader-box-loading")
         box.classList.innerHTML = ""
@@ -57,7 +57,12 @@ function renderItem(item,level,meta) {
 }
 
 function updateViewer() {
-    var viewer_el = renderItem(viewerItem,{top:true,level:0})
+    var viewer_el_loader = createLoaderBox((async () => {
+        viewerItem = await getItemById(viewerItemId)
+        var viewer_el = renderItem(viewerItem,{top:true,level:0})
+        return viewer_el
+    })())
+
     geti("viewer-content").innerHTML = ""
-    geti("viewer-content").appendChild(viewer_el)
+    geti("viewer-content").appendChild(viewer_el_loader)
 }
