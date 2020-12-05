@@ -1,41 +1,43 @@
 
-const TYPE_DISPLAY = {
+export const TYPE_DISPLAY: {[key:string]:string} = {
     audio: "Audio",
     picture: "Picture",
     video: "Video",
     collection: "Collection"
 }
-const KEY_DISPLAY = {
+export const KEY_DISPLAY: {[key:string]:string} = {
     title: "Title: ",
     note: "Note or Description: ",
     meta: "Metadata: ",
     artist: "Artist: ",
 
 }
-const ITEM_SPEC_GEN = {
+export const ITEM_SPEC_GEN: {[key:string]: () => any} = {
     audio: () => ({title: "", artist: ""}),
     picture: () => ({title: "", note: "", meta: ""}),
     video: () => ({title: "", note: "", meta: ""}),
     collection: () => ({title: "", artist: "", note: "", content: []}),
 }
 
-function sleep(ms) {
+export function sleep(ms: number) {
     return new Promise((r, _) => {
         setTimeout(r, ms)
     })
 }
 
-function geti(id) {
-    return document.getElementById(id)
+export function geti(id: string): HTMLElement {
+    var el = document.getElementById(id)
+    if (!el) throw new Error("Element not found: " + id);
+    return el
 }
 
-function para(text) {
+export function para(text: string) {
     var p = document.createElement("p")
     p.textContent = text
     return p
 }
 
-function genSpinner() {
+export function genSpinner() {
     var spinner = document.createElement("div")
     spinner.classList.add("loader-box-spinner")
     for (let i = 0; i < 8; i++) {
@@ -45,10 +47,10 @@ function genSpinner() {
     return spinner
 }
 
-function genericInputSetter(key, type, target, attr) {
+export function genericInputSetter(key: string, type: string, target: any, attr?: any) {
     var label = document.createElement("label")
     var inp = document.createElement((type != "textarea") ? "input" : type)
-    if (type != "textarea") inp.type = type
+    if (type != "textarea") inp.setAttribute("type",type)
     var id = randomId(10)
 
     if (attr) for (const attr_name in attr) {
@@ -67,23 +69,26 @@ function genericInputSetter(key, type, target, attr) {
     label.setAttribute("for",id)
 
     if (type == "textarea") {
-        inp.setAttribute("rows",5)    
+        inp.setAttribute("rows","5")    
     }
 
     var br = document.createElement("br")
     return [label, inp, br]
 }
 
-function fileSelectInput(key,target,accept) {
+export function fileSelectInput(key: string,target: any,accept: string) {
     var div = document.createElement("div")
     var inp = document.createElement("input")
     inp.type = "file"
     inp.onchange = (ev) => {
+        //@ts-ignore
         div.children[0].style.display = "none"
         div.append(para("File ready to upload!"))
         
-        var file = ev.target.files[0]
-        console.log(ev.target.files[0]);
+        //@ts-ignore
+        var file = ev?.target.files[0]
+        //@ts-ignore
+        console.log(ev?.target.files[0]);
         
         target.set("file",file)
     }
@@ -94,7 +99,7 @@ function fileSelectInput(key,target,accept) {
     return div
 }
 
-function randomId(len) {
+export function randomId(len: number) {
     var out = '';
     var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
     for (var i = 0; i < len; i++) {

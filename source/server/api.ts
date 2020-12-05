@@ -1,6 +1,6 @@
 import { Express } from "express";
 import { dbo, db, dboi } from ".";
-import { Audio, Collection, Item, Picture, Video } from "./types";
+import { Audio, Collection, Item, Picture, Video } from "../types";
 import { v4 as UUIDv4 } from "uuid";
 import { join, isAbsolute } from "path";
 import { unlink } from "fs/promises";

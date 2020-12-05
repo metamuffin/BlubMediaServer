@@ -1,6 +1,8 @@
+import { Item } from "../../types"
+import { downloadUrlOfItem } from "../api"
 
 
-async function renderPicture(i,meta) {
+export async function renderPicture(i: Item,meta: any) {
     var div = document.createElement("div")
     div.classList.add("item-picture", "item-picture-loading")
     if (meta.inlist) div.classList.add("item-picture-list")
@@ -12,10 +14,9 @@ async function renderPicture(i,meta) {
 
     var img = document.createElement("img")
     img.src = downloadUrlOfItem(i)
-    await new Promise((r,_) => {
-        img.onload = r
+    await new Promise<void>((r,_) => {
+        img.onload = () => r()
         img.onerror = () => {
-            div = undefined
             r()
         }
     })
@@ -24,6 +25,7 @@ async function renderPicture(i,meta) {
     img.name = i.a.title
     img.title = i.a.note
 
-    div.append(title,img)
+    if (!meta.ingrid) div.appendChild(title)
+    div.appendChild(img)
     return div
 }

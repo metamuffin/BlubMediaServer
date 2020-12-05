@@ -1,12 +1,12 @@
 import Express, { static as estatic, json } from "express";
 import { join } from "path";
 import { MongoClient, Db, Collection as MCollection } from "mongodb";
-import { urlencoded } from "body-parser";
 import { bindApi } from "./api";
 import { bindDownload } from "./download";
-import { Item, Collection } from "./types";
-import connectBusboy from "connect-busboy";
+import { Item, Collection, ROOT_COLLECTION } from "../types";
 import fileUpload from "express-fileupload";
+import Webpack from "webpack"
+import WebpackDevMiddleware from "webpack-dev-middleware"
 
 export var db: MongoClient;
 export var dbo: Db;
@@ -14,7 +14,6 @@ export var dboi: MCollection;
 
 export const errMessage =
     "We got a lot of problems like this. please report this, even if you already reported 5 bugs today.";
-export const ROOT_COLLECTION = "00000000-0000-0000-0000-000000000000";
 
 const SLOWDOWN_DEBUG = false;
 
@@ -24,6 +23,16 @@ async function main() {
     dboi = dbo.collection("item");
 
     const app = Express();
+
+    const webpackConfig = require('../../webpack.config');
+    const compiler = Webpack(webpackConfig)
+    const devMiddleware = WebpackDevMiddleware(compiler, {
+        publicPath: webpackConfig.output.publicPath
+    })
+    app.use("/scripts",devMiddleware)
+
+
+    app.disable("x-powered-by");
 
     app.use(
         fileUpload({
@@ -37,13 +46,13 @@ async function main() {
     //app.use(urlencoded({ extended: true }));
 
     app.get("/", (req, res) => {
-        res.sendFile(join(__dirname, "../client/index.html"));
+        res.sendFile(join(__dirname, "../../public/index.html"));
     });
 
-    app.use("/static", estatic(join(__dirname, "../client")));
+    app.use("/static", estatic(join(__dirname, "../../public")));
 
     app.get("/favicon.ico", (req, res) => {
-        res.sendFile(join(__dirname, "../client/favicon.ico"));
+        res.sendFile(join(__dirname, "../../public/favicon.ico"));
     });
 
     if (SLOWDOWN_DEBUG)
@@ -78,7 +87,6 @@ async function main() {
         console.log("Created new Root Collection");
     }
 
-    app.disable("x-powered-by");
 
     app.listen(8080, "0.0.0.0", () => {
         console.log("Listening...");

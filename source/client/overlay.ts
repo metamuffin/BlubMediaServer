@@ -1,8 +1,9 @@
+import { geti } from "./helper"
 
 
-var overlay_onpop_stack = []
+var overlay_onpop_stack: ((a:any) => any)[] = []
 
-function pushOverlay(el,onpop,escapable) {
+export function pushOverlay(el: HTMLElement,onpop: (a:any) => any,escapable?: boolean) {
     var div = document.createElement("div")
     div.classList.add("overlay")
     div.appendChild(el)
@@ -15,13 +16,14 @@ function pushOverlay(el,onpop,escapable) {
     cont.classList.add("overlay-container-active")
 }
 
-function popOverlay(escape) {
+export function popOverlay(escape?: any) {
     var cont = geti("overlay-container")
     var top = cont.children[cont.children.length - 1]
     console.log(top);
     
     cont.removeChild(top)
-    overlay_onpop_stack.pop()(escape)
+    var p = overlay_onpop_stack.pop()
+    if (p) p(escape)
     if (cont.children.length == 0) {
         cont.classList.remove("overlay-container-active")
     }   

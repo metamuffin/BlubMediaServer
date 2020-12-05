@@ -1,7 +1,7 @@
 
 import {Express} from "express"
 import { validateItem, itemWithFiles, filenameOfItem, getItemByUUID } from "./api";
-import { Item, Collection } from "./types";
+import { Item, Collection } from "../types";
 import archiver from "archiver";
 import {Archiver} from "archiver";
 

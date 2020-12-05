@@ -1,9 +1,10 @@
+import { Item } from "../types"
 
 
 const API_ENDPOINT = "/api"
 
 
-async function getItemById(id) {
+export async function getItemById(id: string) {
     var res = await fetch(API_ENDPOINT + `/item/${id}`, {
         method: "GET",
         headers: {
@@ -15,7 +16,7 @@ async function getItemById(id) {
 }
 
 
-async function addItem(item,formdata) {
+export async function addItem(item: Item,formdata: any) {
     var res = await fetch(API_ENDPOINT + `/add-item?json=${encodeURI(JSON.stringify(item))}`, {
         method: "POST",
         body: formdata,
@@ -26,6 +27,6 @@ async function addItem(item,formdata) {
     return res.status
 }
 
-function downloadUrlOfItem(item) {
+export function downloadUrlOfItem(item: Item) {
     return API_ENDPOINT + `/item-dl/${item.id}`
 }

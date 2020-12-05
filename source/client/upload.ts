@@ -1,5 +1,10 @@
+import { Item, ItemType, ROOT_COLLECTION } from "../types"
+import { addItem } from "./api"
+import { fileSelectInput, genericInputSetter, ITEM_SPEC_GEN, para, TYPE_DISPLAY } from "./helper"
+import { popOverlay, pushOverlay } from "./overlay"
+import { updateViewer } from "./viewer"
 
-const ITEM_ATTRIBUTE_INPUTS = {
+const ITEM_ATTRIBUTE_INPUTS: {[key:string]: (a:any) => HTMLElement[]} = {
     collection: (target) => [
         ...genericInputSetter("title", "text", target),
         ...genericInputSetter("artist", "text", target),
@@ -19,7 +24,7 @@ const ITEM_ATTRIBUTE_INPUTS = {
     ]
 }
 
-function genCollectionInput(target,onlyCollections) {
+export function genCollectionInput(target: any,onlyCollections?: boolean) {
     var div = document.createElement("div")
     var list = document.createElement("table")
     var refresh_list = () => {
@@ -32,7 +37,7 @@ function genCollectionInput(target,onlyCollections) {
             remove_button.type = "button"
             remove_button.value = "X"
             remove_button.onclick = () => {
-                target.splice(target.findIndex(e => e == id))
+                target.splice(target.findIndex((e:any) => e == id))
                 refresh_list()
             }
             name.textContent = id
@@ -55,7 +60,7 @@ function genCollectionInput(target,onlyCollections) {
 }
 
 
-function selectType(onchange) {
+function selectType(onchange: (val: any) => any) {
     var select = document.createElement("select")
     for (const type in TYPE_DISPLAY) {
         if (TYPE_DISPLAY.hasOwnProperty(type)) {
@@ -67,19 +72,20 @@ function selectType(onchange) {
         }
     }
     select.onchange = (ev) => {
-        onchange(ev.target.value)
+        //@ts-ignore
+        onchange(ev?.target?.value)
     }
     return select
 }
 
-function genericItemInputs(target) {
+function genericItemInputs(target: any) {
 
     return [para("Contained in:"),genCollectionInput(target.containedIn)]
 }
 
-async function uploadItemButton() {
+export async function uploadItemButton() {
     var formdata = new FormData()
-    var res_item = {
+    var res_item: Item = {
         type: "collection",
         containedIn: [],
         id: "[PLACEHOLDER]",
@@ -92,7 +98,7 @@ async function uploadItemButton() {
     var type_spec_inputs = document.createElement("div")
     type_spec_inputs.classList.add("type-spec-inputs")
 
-    var type_spec_inputs_update = (value) => {
+    var type_spec_inputs_update = (value: ItemType) => {
         res_item.a = ITEM_SPEC_GEN[value]()
         res_item.type = value
         type_spec_inputs.innerHTML = ""
@@ -120,7 +126,8 @@ async function uploadItemButton() {
 
     submit.onclick = async () => {
         await addItem(res_item,formdata)
-        //popOverlay()
+        updateViewer()
+        popOverlay()
     }
     cancel.onclick = () => {
         popOverlay()

@@ -1,4 +1,14 @@
 
+export type ItemType = "audio"|"picture"|"video"|"collection"
+
+export interface Item {
+    type: ItemType,
+    id: string,
+    a: any
+    containedIn: Array<string>,
+    file?: string
+}
+
 
 export interface Audio {
     title: string,
@@ -17,17 +27,11 @@ export interface Video {
     meta: any
 }
 
-export interface Item {
-    type: "audio"|"picture"|"video"|"collection",
-    id: string,
-    a: any
-    containedIn: Array<string>,
-    file?: string
-}
-
 export interface Collection {
     title: string,
     artist: string,
     note: string,
     content: Array<string>,
 }
+
+export const ROOT_COLLECTION = "00000000-0000-0000-0000-000000000000";

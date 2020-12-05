@@ -1,6 +1,11 @@
+import { renderItem, updateViewer } from "."
+import { viewerItem } from ".."
+import { Item } from "../../types"
+import { geti } from "../helper"
 
+export var viewerMode = "grid"
 
-async function renderCollection(item, meta) {
+export async function renderCollection(item: Item, meta: any) {
     if (meta.level <= 1) {
         var div = document.createElement("div")
         div.classList.add("viewer-content-collection")
@@ -21,7 +26,7 @@ async function renderCollection(item, meta) {
 }
 
 
-function updateViewerCollectionMode() {
+export function updateViewerCollectionMode() {
     var viewer_sel = geti("viewer-sel")
     viewer_sel.innerHTML = ""
     if (viewerItem.type != "collection") return
@@ -43,7 +48,7 @@ function updateViewerCollectionMode() {
 
 var viewerCollectionMode = "normal_grid"
 
-const VIEWER_MODES_COLLECTION = {
+export const VIEWER_MODES_COLLECTION: {[key:string]: {display: string, render: (i:Item, meta:any) => HTMLElement}} = {
     normal_list: {
         display: "Normal (List)",
         render: (i,meta) => {
