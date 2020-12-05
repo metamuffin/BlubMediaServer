@@ -7,6 +7,7 @@ import { Item, Collection, ROOT_COLLECTION } from "../types";
 import fileUpload from "express-fileupload";
 import Webpack from "webpack"
 import WebpackDevMiddleware from "webpack-dev-middleware"
+import { ftpMain } from "./ftp";
 
 export var db: MongoClient;
 export var dbo: Db;
@@ -94,4 +95,5 @@ async function main() {
     });
 }
 
-main();
+//main();
+ftpMain()

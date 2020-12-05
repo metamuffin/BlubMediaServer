@@ -60,7 +60,7 @@ export async function deleteItemByUUID(id: string) {
     return await dbo.collection("item").deleteMany({ id });
 }
 
-export function filenameOfItem(i: Item) {
+export function filenameOfItem(i: {id: string, [key:string]: any}) {
     return join(__dirname, `../../media/${i.id}`);
 }
 
