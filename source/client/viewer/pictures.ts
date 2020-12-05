@@ -1,5 +1,6 @@
 import { Item } from "../../types"
 import { downloadUrlOfItem } from "../api"
+import { buildHoverTooltip } from "./tooltip"
 
 
 export async function renderPicture(i: Item,meta: any) {
@@ -27,5 +28,6 @@ export async function renderPicture(i: Item,meta: any) {
 
     if (!meta.ingrid) div.appendChild(title)
     div.appendChild(img)
+    div.appendChild(buildHoverTooltip(i))
     return div
 }

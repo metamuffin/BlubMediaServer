@@ -31,9 +31,10 @@ export function geti(id: string): HTMLElement {
     return el
 }
 
-export function para(text: string) {
+export function para(text: string, classes?: string[]) {
     var p = document.createElement("p")
     p.textContent = text
+    if (classes) p.classList.add(...classes)
     return p
 }
 

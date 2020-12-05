@@ -1,4 +1,4 @@
-import { viewerItemId } from ".."
+import { updateViewerItem, viewerItem, viewerItemId } from ".."
 import { Item } from "../../types"
 import { getItemById } from "../api"
 import { genSpinner, geti } from "../helper"
@@ -14,11 +14,11 @@ const VIEWER_RENDER_ITEM: {[key:string]: {display: string, render: (i: Item, met
         render: renderPicture
     },
     audio: {
-        display: "Picture",
+        display: "Audio",
         render: async (i) => { throw new Error("No render function. :(") }
     },
     video: {
-        display: "Picture",
+        display: "Video",
         render: async (i) => { throw new Error("No render function. :(") }
     },
     collection: {
@@ -68,7 +68,8 @@ export function renderItem(id: string, meta: any) {
     )
 }
 
-export function updateViewer() {
+export async function updateViewer() {
+    await updateViewerItem()
     var viewer_el = renderItem(viewerItemId, { top: true, level: 0 })
 
     geti("viewer-content").innerHTML = ""

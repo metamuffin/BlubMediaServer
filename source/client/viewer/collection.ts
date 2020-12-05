@@ -1,5 +1,5 @@
 import { renderItem, updateViewer } from "."
-import { viewerItem } from ".."
+import { loadItemPathed, viewerItem } from ".."
 import { Item } from "../../types"
 import { geti } from "../helper"
 
@@ -20,6 +20,9 @@ export async function renderCollection(item: Item, meta: any) {
         div.classList.add("viewer-content-collection", "viewer-content-collection-hide-content")
         var title_p = document.createElement("h4")
         title_p.textContent = item.a.title
+        div.onclick = () => {
+            loadItemPathed(item.id)
+        }
         div.appendChild(title_p)
         return div
     }

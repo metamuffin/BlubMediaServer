@@ -1,0 +1,26 @@
+
+
+
+.hover-tooltip {
+    display: none;
+    position: absolute;
+}
+
+div:hover>.hover-tooltip {
+    background-color: var(--accent-1-l);
+    padding: 0.5em;
+    min-width: 10em;
+    border: 0px solid transparent;
+    border-radius: 0.5em;
+    display: block;
+    animation: tooltip-fade 0.5s linear 0s 1 forwards;
+}
+
+@keyframes tooltip-fade {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}

@@ -67,3 +67,7 @@ div.type-spec-inputs {
 label {
     text-align: right;
 }
+
+.btn-edit {
+    float: right;
+}

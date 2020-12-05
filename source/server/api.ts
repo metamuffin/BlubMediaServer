@@ -61,7 +61,7 @@ export async function deleteItemByUUID(id: string) {
 }
 
 export function filenameOfItem(i: Item) {
-    return join(__dirname, `../media/${i.id}`);
+    return join(__dirname, `../../media/${i.id}`);
 }
 
 export function bindApi(app: Express) {
@@ -100,6 +100,7 @@ export function bindApi(app: Express) {
                 containedIn: [],
                 id: "[IOLD PLACEHOLDER]",
                 type: i.type,
+                timestamp: 0
             },
             i
         );

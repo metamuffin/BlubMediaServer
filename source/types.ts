@@ -5,6 +5,7 @@ export interface Item {
     type: ItemType,
     id: string,
     a: any
+    timestamp: number,
     containedIn: Array<string>,
     file?: string
 }

@@ -60,7 +60,7 @@ export function genCollectionInput(target: any,onlyCollections?: boolean) {
 }
 
 
-function selectType(onchange: (val: any) => any) {
+export function selectType(onchange: (val: any) => any) {
     var select = document.createElement("select")
     for (const type in TYPE_DISPLAY) {
         if (TYPE_DISPLAY.hasOwnProperty(type)) {
@@ -78,7 +78,7 @@ function selectType(onchange: (val: any) => any) {
     return select
 }
 
-function genericItemInputs(target: any) {
+export function genericItemInputs(target: any) {
 
     return [para("Contained in:"),genCollectionInput(target.containedIn)]
 }
@@ -89,7 +89,8 @@ export async function uploadItemButton() {
         type: "collection",
         containedIn: [],
         id: "[PLACEHOLDER]",
-        a: {}
+        a: {},
+        timestamp: 0
     }
 
     var el = document.createElement("div")
@@ -114,7 +115,6 @@ export async function uploadItemButton() {
     el.append(...genericItemInputs(res_item))
     el.appendChild(select)
     el.appendChild(type_spec_inputs)
-
 
     var submit = document.createElement("input"); submit.type = "button"
     var cancel = document.createElement("input"); cancel.type = "button"

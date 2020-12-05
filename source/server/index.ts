@@ -82,6 +82,7 @@ async function main() {
             a: c,
             containedIn: [],
             type: "collection",
+            timestamp: 0,
         };
         await dboi.insertOne(i);
         console.log("Created new Root Collection");

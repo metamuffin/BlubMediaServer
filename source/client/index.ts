@@ -1,4 +1,5 @@
 import { Item } from "../types"
+import { getItemById } from "./api";
 import { geti } from "./helper";
 import { uploadItemButton } from "./upload";
 import { updateViewer } from "./viewer";
@@ -10,19 +11,25 @@ export var viewerItem: Item;
 
 var path = []
 
+export async function updateViewerItem() {
+    viewerItem = await getItemById(viewerItemId)
+}
 
-
-async function loadItemPathed(id: string) {
+export async function loadItemPathed(id: string) {
     viewerItemId = id
     path.push(id)
-    window.history.pushState({id: id}, document.title)
+    //window.location.hash = id
+    console.log("pushstate: " + id)
+    window.history.pushState({id}, document.title)
     updateViewer()
 }
 
 window.onpopstate = function (ev: any) {
     var state = ev.state
+    if (!ev.state) return console.log("onpopstate without state")
+    console.log(ev.state);
     if (state.id != viewerItem.id) {
-        viewerItem.id = state.id
+        viewerItemId = state.id
         updateViewer()
     }
 }
